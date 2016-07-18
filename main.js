@@ -1,28 +1,55 @@
-var inquirer = require ('inquirer'); //npm inquirer
+var letter = require("./letter.js");
+var Word = require("./word.js")
 
-inquirer.prompt([ //Starts game via prompt
 
-  {
-    type: "list", // list type
-    name: "Ready up!", // used to access user input
-    message: "Welcome to HANGMAN! Are you ready to play?", // Displays message
-    choices: ["Sure", "No Thanks!"] // Choices 
-  }
+var game = {
+  wordBank:["Serenity", "Tranquility", "Ethereal"],
+  guessesRemaining: 10,
+  currentWord: null,
+  startGame: function(wrd){
 
- ]).then(function(answers){ 
+    this.currentWord = new Word(this.wordBank[Math.floor(Math.random()* this.wordBank.length)]);
+    this.currentWord.getLets();
+    this.PromptUser();
+  },
 
-  if(answers.start == "Sure"){ 
-    
-    inquirer.prompt([ 
+  PromptUser: function(){
+    var self = this;
+       prompt.get(["guessLetter"], function(err, result){
+      console.log("You guessed" + result.guessLetter);
+      var findHowManyOfUserGuess = self.currentWord.checkIfLetterFound(result.guessLetter);
+   
 
-      {
-        type: "list", 
-        name: "category", 
-        message: "Pick a category", 
-        choices: ["Movies", "Games"] 
+
+    if (findHowManyOfUserGuess === 0){
+      console.log("Sorry!");
+      self.guessesRemaining -= 1;
+    }else{
+      console.log("Good job!");
+
+      if(self.currentWord.didWeFindTheWord()){
+        console.log("You Win!");
+        return 1;
       }
-      ])
     }
-  }
+
+    console.log("Guesses remaining: " + self.guessesRemaining);
+    console.log(self.wordRender.currentWord())
+ 
 
 
+    if ((self.guessesRemaining > 0) && (self.currentWord.found == false)){
+      self.keepPromptingUser();
+    }
+    else if(self.guessesRemaining == 0){
+      console.log('Better luck next time! ', self.currentWord.word);
+    }else{
+      console.log(self.currentWord.wordRender());
+    }
+
+  });
+}
+
+};
+
+game.startGame();
